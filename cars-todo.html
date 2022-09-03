@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+    integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V" crossorigin="anonymous" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/toast.css" />
+  <script src="assets/toast.js"></script>
+  <title>Todo</title>
+</head>
+
+<body>
+  <div class="table-area">
+    <div class="col-md-6 col-sm-10 mx-auto" style="margin-top: 50px">
+      <table class="table table-bordered table-hover">
+        <thead style="background-color: #fff; color: black">
+          <tr>
+            <th style="width: 15px">№</th>
+            <th>Avtomobiller</th>
+            <th style="width: 100px">
+              <button class="btn btn-success">
+                <i class="fa fa-plus"></i>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  </div>
+
+  <script>
+
+    var cars = [];
+    $(document).ready(function () {
+      loadTable();
+
+    })
+
+    function loadTable() {
+      if (localStorage.getItem('cars')) {
+        let my_cars = JSON.parse(localStorage.getItem("cars"));
+        if (my_cars) {
+          cars = my_cars
+        }
+        cars.map((item, index) => {
+          $("tbody").append(`
+            <tr data-id="${item.id}">
+                <td>${index + 1}</td>
+                <td>${item.car_name}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
+                    <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                </td>            
+           </tr>
+        `)
+        })
+      }
+    }
+
+
+    $("tbody").on("click", ".add-car", function () {
+      var tr = $(this).parents("tr");
+      var car_name = tr.find('input[name="add_car"]').val().trim();
+
+      tr.find("td:eq(1)").text(car_name);
+      tr.find("td:eq(2)").html(`
+    <button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
+    <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+              `);
+      tr.attr("data-id", Math.floor(Math.random() * 232523));
+
+      var id = tr.attr("data-id");
+      cars.push({ id, car_name })
+      localStorage.setItem('cars', JSON.stringify(cars))
+      toastr.success("Avtomobil ugurla əlavə olundu!");
+    });
+
+    $("tbody").on("click", ".btn-danger", function () {
+      var tr = $(this).parents("tr");
+      var car_name = tr.find('input[name="add_car"]').val();
+      var id = tr.attr("data-id");
+      let delete_cars = JSON.parse(localStorage.getItem('cars'))
+      console.log(delete_cars);
+      let cars = delete_cars.filter(a => a.id != id)
+      localStorage.setItem('cars', JSON.stringify(cars))
+
+      tr.remove();
+      numbering();
+      toastr.success(`Avtomobil ugurla silindi!`);
+
+    });
+
+    $("tbody").on("click", ".btn-primary", function () {
+      var tr = $(this).parents("tr");
+      var old_car_name = tr.find("td:eq(1)").text().trim();
+      tr.find("td:eq(1)").html(
+        `<input type="text" value=${old_car_name}  name='add_car' class="form-control"/>`
+      );
+      console.log(tr.find('input[name="add_car"]').val());
+      tr.find("td:eq(1)").attr("old-car", old_car_name);
+      tr.find("td:eq(2)").html(`
+    <button class="btn btn-success edit-car btn-sm"><i class="fa fa-save"></i></button>
+    <button class="btn btn-sm btn-warning remove-car"><i class="fa fa-times"></i></button>`);
+    });
+    $("tbody").on("click", ".remove-car", function () {
+      var tr = $(this).parents("tr");
+      var old_car_name = tr.find("td:eq(1)").attr("old-car");
+
+      tr.find("td:eq(1)").text(old_car_name);
+      tr.find("td:eq(2)").html(`
+      				<button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
+      				<button class="btn btn-danger  btn-sm"><i class="fa fa-trash"></i></button>`);
+    });
+
+    $("tbody").on("click", ".edit-car", function () {
+      var tr = $(this).parents("tr");
+      var id = tr.attr("data-id");
+
+      var new_car = tr.find('input[name="add_car"]').val().trim();
+
+      tr.find("td:eq(1)").text(new_car);
+      tr.find("td:eq(2)").html(`
+      				<button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
+      				<button class="btn btn-danger  btn-sm"><i class="fa fa-trash"></i></button>`);
+
+      let edit_cars = JSON.parse(localStorage.getItem('cars'))
+      let check = edit_cars.find(a => a.id == id);
+      if (check) {
+        check.car_name = new_car
+        localStorage.setItem('cars', JSON.stringify(edit_cars))
+      }
+
+    });
+
+    $("thead").on("click", ".btn-success", function () {
+      $("tbody").append(`
+    <tr>
+    <td></td>
+    <td><input type="text" name='add_car' class="form-control"/></td>
+    <td>
+        <button class="btn btn-sm btn-success add-car"><i class="fa fa-save"></i></button>
+        <button class="btn btn-sm btn-warning cancel-car"><i class="fa fa-times"></i></button>
+    </td>
+    </tr>
+    `);
+      numbering();
+    });
+
+    function numbering() {
+      var i = 1;
+      $("tbody tr").each(function () {
+        $(this)
+          .find("td:eq(0)")
+          .text(i++);
+      });
+    }
+    $("tbody").on("click", ".cancel-car", function () {
+      $(this).parents("tr").remove();
+      numbering();
+    });
+  </script>
+</body>
+
+</html>
