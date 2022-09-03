@@ -73,17 +73,23 @@
       var tr = $(this).parents("tr");
       var car_name = tr.find('input[name="add_car"]').val().trim();
 
-      tr.find("td:eq(1)").text(car_name);
-      tr.find("td:eq(2)").html(`
+      if (car_name) {
+        tr.find("td:eq(1)").text(car_name);
+        tr.find("td:eq(2)").html(`
     <button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
     <button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
               `);
-      tr.attr("data-id", Math.floor(Math.random() * 232523));
+        tr.attr("data-id", Math.floor(Math.random() * 232523));
+        var id = tr.attr("data-id");
+        cars.push({ id, car_name })
+        localStorage.setItem('cars', JSON.stringify(cars))
+        toastr.success("Avtomobil ugurla əlavə olundu!");
+      }
+      else {
+        toastr.error('Avtomobil daxil edin!')
+      }
 
-      var id = tr.attr("data-id");
-      cars.push({ id, car_name })
-      localStorage.setItem('cars', JSON.stringify(cars))
-      toastr.success("Avtomobil ugurla əlavə olundu!");
+
     });
 
     $("tbody").on("click", ".btn-danger", function () {
@@ -128,19 +134,24 @@
       var id = tr.attr("data-id");
 
       var new_car = tr.find('input[name="add_car"]').val().trim();
+      if (new_car) {
 
-      tr.find("td:eq(1)").text(new_car);
-      tr.find("td:eq(2)").html(`
+        tr.find("td:eq(1)").text(new_car);
+        tr.find("td:eq(2)").html(`
       				<button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
       				<button class="btn btn-danger  btn-sm"><i class="fa fa-trash"></i></button>`);
 
-      let edit_cars = JSON.parse(localStorage.getItem('cars'))
-      let check = edit_cars.find(a => a.id == id);
-      if (check) {
-        check.car_name = new_car
-        localStorage.setItem('cars', JSON.stringify(edit_cars))
+        let edit_cars = JSON.parse(localStorage.getItem('cars'))
+        let check = edit_cars.find(a => a.id == id);
+        if (check) {
+          check.car_name = new_car
+          localStorage.setItem('cars', JSON.stringify(edit_cars))
+        }
       }
+      else {
+        toastr.error(`Yeni avtomobili daxil edin!`);
 
+      }
     });
 
     $("thead").on("click", ".btn-success", function () {
