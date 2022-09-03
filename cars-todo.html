@@ -39,12 +39,12 @@
 
   </div>
 
+
   <script>
 
     var cars = [];
     $(document).ready(function () {
       loadTable();
-
     })
 
     function loadTable() {
@@ -110,10 +110,13 @@
     $("tbody").on("click", ".btn-primary", function () {
       var tr = $(this).parents("tr");
       var old_car_name = tr.find("td:eq(1)").text().trim();
+      console.log(old_car_name);
+
+
       tr.find("td:eq(1)").html(
-        `<input type="text" value=${old_car_name}  name='add_car' class="form-control"/>`
+        `<input type="text" value="${old_car_name}"  name='add_car' class="form-control"/>`
       );
-      console.log(tr.find('input[name="add_car"]').val());
+
       tr.find("td:eq(1)").attr("old-car", old_car_name);
       tr.find("td:eq(2)").html(`
     <button class="btn btn-success edit-car btn-sm"><i class="fa fa-save"></i></button>
@@ -140,13 +143,14 @@
         tr.find("td:eq(2)").html(`
       				<button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
       				<button class="btn btn-danger  btn-sm"><i class="fa fa-trash"></i></button>`);
-
+        toastr.success(`Avtomobil ugurla deyisdirildi!`);
         let edit_cars = JSON.parse(localStorage.getItem('cars'))
         let check = edit_cars.find(a => a.id == id);
         if (check) {
           check.car_name = new_car
           localStorage.setItem('cars', JSON.stringify(edit_cars))
         }
+
       }
       else {
         toastr.error(`Yeni avtomobili daxil edin!`);
@@ -180,6 +184,9 @@
       $(this).parents("tr").remove();
       numbering();
     });
+
+
+
   </script>
 </body>
 
